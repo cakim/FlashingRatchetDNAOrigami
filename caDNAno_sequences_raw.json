@@ -1,0 +1,18 @@
+{
+    "scaffold": "AATG", 
+    "staples": [
+        {
+            "color": "red", 
+            "start": [
+                0, 
+                22
+            ], 
+            "length": 4, 
+            "end": [
+                0, 
+                20
+            ], 
+            "seq": "CATT"
+        }
+    ]
+}

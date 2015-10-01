@@ -5,8 +5,8 @@ def comp_seq_FN(raw_sequence):
     complement = {'a':'T', 'A':'T', 'c':'G', 'C':'G', 'g':'C', 'G':'C', 't':'A', 'T':'A'}
     antisense_seq = ''
     for letter in raw_sequence:
-	if letter in uppercase:
-            antisense_seq = complement[letter] + antisense_seq
+        if letter in uppercase:
+                antisense_seq = complement[letter] + antisense_seq
     return antisense_seq
 
 
@@ -31,7 +31,7 @@ num_vstrands = len(vstrands)
 num_helices = num_vstrands
 vsn = {}
 for vstrand_num in range(num_vstrands):
-	vsn[vstrands[vstrand_num]['num']] = vstrand_num
+    vsn[vstrands[vstrand_num]['num']] = vstrand_num
 vsn[-1] = -1
 
 
@@ -40,48 +40,50 @@ vsn[-1] = -1
 null_bp = [-1, -1]
 num_bases = len(vstrands[0]['scaf'])
 for helix_num in range(num_helices):
-	for base_num in range(num_bases):
-		bpp = vstrands[vsn[helix_num]]['scaf'][base_num]
-		if (bpp[:2] == null_bp) and (bpp[2:] != null_bp):
-			start_bp = [helix_num, base_num]
+    for base_num in range(num_bases):
+        bpp = vstrands[vsn[helix_num]]['scaf'][base_num]
+        if (bpp[:2] == null_bp) and (bpp[2:] != null_bp):
+            start_bp = [helix_num, base_num]
 
 
 # Assign m13 sequence to the scaffold path
 # Initialize data structure
 scaf_base_seq_dc = {}
 for helix_num in range(num_helices):
-	scaf_base_seq_dc[helix_num] = ['.' for i in range(num_bases)]
+    scaf_base_seq_dc[helix_num] = ['.' for i in range(num_bases)]
 
 # Fill in sequence
+scaffold_string = ""
 counter = 0
 [helix_num, base_num] = start_bp
 base_length = 1 + vstrands[vsn[helix_num]]['loop'][base_num]
 base_length += vstrands[vsn[helix_num]]['skip'][base_num]
 scaf_base_seq_dc[helix_num][base_num] = scaf_seq[counter:counter + base_length]
+scaffold_string += scaf_seq[counter:counter + base_length]
 counter += base_length
 while vstrands[vsn[helix_num]]['scaf'][base_num][2:] != null_bp:
-	[helix_num, base_num] = vstrands[vsn[helix_num]]['scaf'][base_num][2:]
-	base_length = 1 + vstrands[vsn[helix_num]]['loop'][base_num]
-	base_length += vstrands[vsn[helix_num]]['skip'][base_num]
-	scaf_base_seq_dc[helix_num][base_num] = scaf_seq[counter:counter + base_length]
-	counter += base_length
-print scaf_base_seq_dc
+    [helix_num, base_num] = vstrands[vsn[helix_num]]['scaf'][base_num][2:]
+    base_length = 1 + vstrands[vsn[helix_num]]['loop'][base_num]
+    base_length += vstrands[vsn[helix_num]]['skip'][base_num]
+    scaf_base_seq_dc[helix_num][base_num] = scaf_seq[counter:counter + base_length]
+    scaffold_string += scaf_seq[counter:counter + base_length]
+    counter += base_length
 
 # Generate list of staple strand paths
 # Search for all 5prime ends of stap paths
 # For each of these, parse to the end of that path
 stap_path_ra = []
 for start_helix_num in range(num_helices):
-	for start_base_num in range(num_bases):
-		bpp = vstrands[vsn[start_helix_num]]['stap'][start_base_num]
-		if (bpp[:2] == null_bp) and (bpp[2:] != null_bp):
-			sub_ra = []
-			[helix_num, base_num] = [start_helix_num, start_base_num]
-			sub_ra.append([helix_num, base_num])
-			while vstrands[vsn[helix_num]]['stap'][base_num][2:] != null_bp:
-				[helix_num, base_num] = vstrands[vsn[helix_num]]['stap'][base_num][2:]
-				sub_ra.append([helix_num, base_num])
-			stap_path_ra.append(sub_ra)
+    for start_base_num in range(num_bases):
+        bpp = vstrands[vsn[start_helix_num]]['stap'][start_base_num]
+        if (bpp[:2] == null_bp) and (bpp[2:] != null_bp):
+            sub_ra = []
+            [helix_num, base_num] = [start_helix_num, start_base_num]
+            sub_ra.append([helix_num, base_num])
+            while vstrands[vsn[helix_num]]['stap'][base_num][2:] != null_bp:
+                [helix_num, base_num] = vstrands[vsn[helix_num]]['stap'][base_num][2:]
+                sub_ra.append([helix_num, base_num])
+            stap_path_ra.append(sub_ra)
 
 
 stap_color_dc  = {}
@@ -102,39 +104,35 @@ stap_color_dc[8947848]  = 'light gray'
 # Initialize a color data structure
 stap_color_2d_dc = {}
 for helix_num in range(num_helices):
-	stap_color_2d_dc[helix_num] = [-1 for i in range(num_bases)]
+    stap_color_2d_dc[helix_num] = [-1 for i in range(num_bases)]
 # Assign colors
 for helix_num in range(num_helices):
-	for [base_num, color_value] in vstrands[vsn[helix_num]]['stap_colors']:
-		stap_color_2d_dc[helix_num][base_num] = stap_color_dc[color_value]
-	
+    for [base_num, color_value] in vstrands[vsn[helix_num]]['stap_colors']:
+        stap_color_2d_dc[helix_num][base_num] = stap_color_dc[color_value]
 
 # Generate staple strand sequences, annotate with color, start base, end base
+staples_data = []
 for sub_ra in stap_path_ra:
-	[helix_num, base_num] = sub_ra[0]
-	stap_color = stap_color_2d_dc[helix_num][base_num]
-	start_base = sub_ra[0]
-	end_base = sub_ra[-1]
-	seq = ''
-	for [helix_num, base_num] in sub_ra:
-		seq += comp_seq_FN(scaf_base_seq_dc[helix_num][base_num])
-	annotation_string  = str(stap_color) + ', ' + 'start ' + str(start_base) + ', '
-	annotation_string += 'end ' + str(end_base) + ', length ' + str(len(seq))
-	print seq + '\t\t' + annotation_string
+    staple_data = {}
+    [helix_num, base_num] = sub_ra[0]
+    staple_data["color"] = stap_color_2d_dc[helix_num][base_num]
+    staple_data["start"] = sub_ra[0]
+    staple_data["end"] = sub_ra[-1]
+    seq = ''
+    for [helix_num, base_num] in sub_ra:
+        seq += comp_seq_FN(scaf_base_seq_dc[helix_num][base_num])
+    staple_data["seq"] = seq
+    staple_data["length"] = len(seq)
+    staples_data.append(staple_data)
 
 
-
-# Color annotation
-
-
-			
-
+#print everything out
+output = {}
+output["scaffold"] = scaffold_string
+output["staples"] = staples_data
 
 
-
-
-
-
-
-
-
+import json
+text_file = open("caDNAno_sequences_raw.json", "w")
+text_file.write(json.dumps(output, indent=4))
+text_file.close()
