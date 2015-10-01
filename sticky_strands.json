@@ -1,4 +1,14 @@
 {
     "red": "CCAAGG",
-    "green": "CCAA"
+    "red orange": "",
+    "light orange": "",
+    "olive": "",
+    "light green": "",
+    "dark green": "CCAA",
+    "cyan": "CC",
+    "blue": "CC",
+    "purple": "CA",
+    "magenta": "CA",
+    "dark gray": "CA",
+    "light gray": "CA"
 }

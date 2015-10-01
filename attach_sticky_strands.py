@@ -1,5 +1,7 @@
 import sys
 
+#for now we're assuming attach only to 3' end, but that can change
+
 # Read in json file
 input_file = file('caDNAno_sequences_raw.json', 'r')
 sequence_data = eval(input_file.read())
