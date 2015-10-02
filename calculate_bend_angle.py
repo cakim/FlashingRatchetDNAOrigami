@@ -1,7 +1,7 @@
 # coding=utf-8
 
 
-def calc_bend_angle(nRef, nDiff, degrees, verbose):
+def calc_bend_angle(nRef, nDiff, degrees=True, verbose=False):
 
     deq = 0.335 # unperturbed length-per-base-pair in B-form DNA
 
@@ -17,30 +17,25 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
     helix_diam = 2.25
 
 
-    # n is the number of basepairs installed in region with
-    #   a default of nref base pairs
-    # e.g. nref = 105
-    n = [0 for i in range(num_helices)]
-
     # delta is the distance in nm from an arbitrary axis
     # n is number of bp in each helix
     delta = [0 for i in range(num_helices)]
+    n = [0 for i in range(num_helices)]
     for helix_num in range(2):
         delta[helix_num] = -helix_diam
-        n[helix_num] = nDiff - nDiff
+        n[helix_num] = nRef - nDiff
     for helix_num in range(2, 4):
         delta[helix_num] = 0
-        n[helix_num] = nDiff
+        n[helix_num] = nRef
     for helix_num in range(4, 6):
         delta[helix_num] = helix_diam
-        n[helix_num] = nDiff + nDiff
+        n[helix_num] = nRef + nDiff
 
-    print(n)
     total_n = 0
     for i in range(num_helices):
         total_n += n[i]
     average_n = float(total_n)/num_helices
-    if (verbose):
+    if verbose:
         print "average n is", average_n, "\n"
 
 
@@ -63,13 +58,13 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
         beta_delta_sum += beta[i]*delta[i]
     numerator = deq*beta_n_sum
     denominator_term_0 = beta_delta_sum
-    denominator_term_1 = (B/S)*(one_div_n_sum)
+    denominator_term_1 = (B/S)*one_div_n_sum
     denominator = denominator_term_0 + denominator_term_1
     theta = numerator/denominator
 
     theta_in_degrees = theta*180/3.1416
-    if (verbose):
-        print "theta is", theta_in_degrees,"degrees or ", theta, "radians"
+    if verbose:
+        print "theta is", theta_in_degrees, "degrees or ", theta, "radians"
 
     # Calculate d
     d = [0 for i in range(num_helices)]
@@ -78,7 +73,7 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
         factor_1 = deq*num_helices/one_div_n_sum
         d[i] = (factor_0 + factor_1)/n[i]
 
-    if (verbose):
+    if verbose:
         for i in range(num_helices):
             print "helix", i, "\tlength per bp is", d[i]
 
@@ -91,7 +86,7 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
         print "denominator_term_1 is", denominator_term_1
         print "denominator is", denominator
 
-    if (degrees):
+    if degrees:
         return theta_in_degrees
     return theta
 
