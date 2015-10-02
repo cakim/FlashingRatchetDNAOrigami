@@ -9,9 +9,11 @@ import math
 #num_segments = n/7 is a multiple of the # of different strands in the potential well (between 4 and 7 to keep things reasonable)
 #n is less than 700bp - we don't want to design a huge, huge thing
 #num_segments/n_diff is close to integer - distribute deletions/insertions evenly
+#num_segments/3 = integer, multipe of 21bp
 
-num_potential_strands_range = [4, 20]
-num_segments_max = 100#n = 700bp
+num_potential_strands_range = [4, 12]
+num_segments_max = 200#n = 700bp
+num_segments_min = 0
 
 num_bp_per_segment = 7
 
@@ -27,6 +29,7 @@ def calculate_num_segments_range():
     return None
 
 num_segments_range = calculate_num_segments_range()
+
 
 min_theta_error_candidate = {"theta_error": 100}
 
@@ -64,8 +67,14 @@ def factors(num):
     return list(facts)
 
 for num_potential_strands in range(num_potential_strands_range[0], num_potential_strands_range[1]+1):
-    min_num_segments = int(math.ceil(num_segments_range[0]/num_potential_strands)*num_potential_strands)
+    min_num_segments = int(math.ceil(num_segments_range[0]/float(num_potential_strands))*num_potential_strands)
     for num_segments in range(min_num_segments, num_segments_range[1]+1, num_potential_strands):
+
+        if num_segments % 3 != 0:
+            continue
+        if num_segments_min > num_segments:
+            continue
+
 
         n = num_segments*num_bp_per_segment
         n_diff = solve_for_n_diff(n)
