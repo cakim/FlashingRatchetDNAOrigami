@@ -7,12 +7,12 @@ import math
 #n is a multiple of 7bp (num_segments is integer)
 #n_diff/num_segments <= 1, no more than one deletion insertion per segment
 #num_segments = n/7 is a multiple of the # of different strands in the potential well (between 4 and 7 to keep things reasonable)
-#n is less than 700bp - we don't want to design a huge, huge thing
+#n is less than some #bp - we don't want to design a huge, huge thing
 #num_segments/n_diff is close to integer - distribute deletions/insertions evenly
 #num_segments/3 = integer, multipe of 21bp
 
 num_potential_strands_range = [4, 12]
-num_segments_max = 200#n = 700bp
+num_segments_max = 200
 num_segments_min = 0
 
 num_bp_per_segment = 7
