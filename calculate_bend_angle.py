@@ -1,7 +1,7 @@
 # coding=utf-8
 
 
-def calc_bend_angle(nRef, nDiff, degrees=True, verbose=False):
+def calc_bend_angle(nRef, nDiff, degrees=True, verbose=False, force_print_ds=False):
 
     deq = 0.335 # unperturbed length-per-base-pair in B-form DNA
 
@@ -73,10 +73,11 @@ def calc_bend_angle(nRef, nDiff, degrees=True, verbose=False):
         factor_1 = deq*num_helices/one_div_n_sum
         d[i] = (factor_0 + factor_1)/n[i]
 
-    if verbose:
+    if verbose or force_print_ds:
         for i in range(num_helices):
             print "helix", i, "\tlength per bp is", d[i]
 
+    if verbose:
         print "delta_div_n_sum is", delta_div_n_sum
         print "one_div_n_sum is", one_div_n_sum
         print "beta_n_sum is", beta_n_sum
