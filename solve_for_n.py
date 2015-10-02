@@ -10,7 +10,7 @@ import math
 #n is less than 700bp - we don't want to design a huge, huge thing
 #num_segments/n_diff is close to integer - distribute deletions/insertions evenly
 
-num_potential_strands_range = [4, 9]
+num_potential_strands_range = [4, 20]
 num_segments_max = 100#n = 700bp
 
 num_bp_per_segment = 7
@@ -28,50 +28,61 @@ def calculate_num_segments_range():
 
 num_segments_range = calculate_num_segments_range()
 
+min_theta_error_candidate = {"theta_error": 100}
 
-min_theta_error_candidate = {"theta_erorr": 100}
-
-def print_candidate(num_segments, n_diff, num_potential_strands):
+def print_candidate(num_segments, n_diff, num_potential_strands, n_diff_period):
     print('\n')
 
-    num_seg_per_del_insert = round(num_segments/n_diff)
-    final_n_diff = num_segments/num_seg_per_del_insert
-    theta = calc_bend_angle(num_segments*7, final_n_diff)
+    theta = calc_bend_angle(num_segments*7, n_diff)
     theta_error = (360-theta)/3.6
 
-    print(str(num_potential_strands) + ' strands per well, ' + str(num_segments) + ' segments, ' +
-          "{0:.2f}".format(theta_error) + '% theta error, ' + str(num_segments*7) + ' bplong, ' +
-          str(num_segments/final_n_diff) + ' insertions/deletions per segment')
+    print str(num_potential_strands) + ' strands per well,',
+    print str(num_segments) + ' segments,',
+    print "{0:.2f}".format(theta_error) + '% theta error,',
+    print str(num_segments*7) + ' bp long,',
+    print str(n_diff) + " insertions/deletions ,",
+    print str(n_diff/num_segments*n_diff_period) + ' insertions/deletions per',
+    if n_diff_period == 1:
+        print "segment"
+    else:
+        print str(n_diff_period) + ' segments'
 
-    calc_bend_angle(num_segments*7, n_diff, True, False, True)
+    #calc_bend_angle(num_segments*7, n_diff, True, False, False)
 
-    if abs(theta_error) < min_theta_error_candidate["theta_erorr"]:
-        min_theta_error_candidate["theta_erorr"] = abs(theta_error)
+    if abs(theta_error) < min_theta_error_candidate["theta_error"]:
+        min_theta_error_candidate["theta_error"] = abs(theta_error)
         min_theta_error_candidate["num_segments"] = num_segments
-        min_theta_error_candidate["n_diff"] = final_n_diff
+        min_theta_error_candidate["n_diff"] = n_diff
+        min_theta_error_candidate["n_diff_period"] = n_diff_period
         min_theta_error_candidate["num_potential_strands"] = num_potential_strands
 
 
-tolerance = 0.1
+tolerance = 5
+
+def factors(num):
+    facts =  set(reduce(list.__add__, ([i, num//i] for i in range(1, int(num**0.5) + 1) if num % i == 0)))
+    return list(facts)
 
 for num_potential_strands in range(num_potential_strands_range[0], num_potential_strands_range[1]+1):
     min_num_segments = int(math.ceil(num_segments_range[0]/num_potential_strands)*num_potential_strands)
     for num_segments in range(min_num_segments, num_segments_range[1]+1, num_potential_strands):
+
         n = num_segments*num_bp_per_segment
         n_diff = solve_for_n_diff(n)
-        remainder = num_segments/n_diff - round(num_segments/n_diff)
-        if abs(remainder) < tolerance:
-            print_candidate(num_segments, n_diff, num_potential_strands)
+
+        num_segments_factors = factors(num_segments)
+        for i, val in enumerate(num_segments_factors):
+            remainder = n_diff/val - round(n_diff/val)
+            if abs(remainder*val) < tolerance and (round(n_diff/val) in num_segments_factors):
+                factor1 = val
+                factor2 = round(n_diff/val)
+                n_diff = factor1*factor2
+                print_candidate(num_segments, n_diff, num_potential_strands, num_segments/max(factor1, factor2))
+
 
 print "\n\n"
 print "candidate with min theta error:"
 print_candidate(min_theta_error_candidate["num_segments"], min_theta_error_candidate["n_diff"],
-                min_theta_error_candidate["num_potential_strands"])
+                min_theta_error_candidate["num_potential_strands"], min_theta_error_candidate["n_diff_period"])
+print calc_bend_angle(min_theta_error_candidate["num_segments"]*num_bp_per_segment, min_theta_error_candidate["n_diff"], True, False, True)
 print "\n"
-
-#n_diff = solve_for_n_diff(n, 360)
-#
-#
-#theta = calc_bend_angle(n, n_diff, True, True)
-#print n_diff
-#print n_diff*7/n
