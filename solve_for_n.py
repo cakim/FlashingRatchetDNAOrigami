@@ -2,7 +2,7 @@ from calculate_bend_angle import calc_bend_angle
 
 
 tolerance = 0.1
-n = 200
+n = 500
 target_theta = 120
 
 
