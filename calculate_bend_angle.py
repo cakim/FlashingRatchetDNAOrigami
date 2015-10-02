@@ -8,12 +8,13 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
     # one that includes twist-stretch coupling (S=1100 pN, B=230 pN· nm, D=-90pN· nm)
     # and another set (S=660 pN, B=230 pN· nm, D=0 pN· nm) excluding twist-stretch coupling and with S and B
     # calculated via a Young’s modulus derived from a DNA persistence length of 50 nm and our experimentally
-    #observed effective helix diameter
+    # observed effective helix diameter
     S = float(660)
     B = float(230)
 
 
     num_helices = 6
+    helix_diam = 2.25
 
 
     # n is the number of basepairs installed in region with
@@ -22,20 +23,19 @@ def calc_bend_angle(nRef, nDiff, degrees, verbose):
     n = [0 for i in range(num_helices)]
 
     # delta is the distance in nm from an arbitrary axis
-    # Assume 156 bp average length of helix
-    ref_helix_length = nRef
+    # n is number of bp in each helix
     delta = [0 for i in range(num_helices)]
     for helix_num in range(2):
-        delta[helix_num] = -2.5
-        n[helix_num] = ref_helix_length - nDiff
+        delta[helix_num] = -helix_diam
+        n[helix_num] = nDiff - nDiff
     for helix_num in range(2, 4):
         delta[helix_num] = 0
-        n[helix_num] = ref_helix_length
+        n[helix_num] = nDiff
     for helix_num in range(4, 6):
-        delta[helix_num] = 2.5
-        n[helix_num] = ref_helix_length + nDiff
+        delta[helix_num] = helix_diam
+        n[helix_num] = nDiff + nDiff
 
-
+    print(n)
     total_n = 0
     for i in range(num_helices):
         total_n += n[i]
